@@ -1,0 +1,71 @@
+@startuml
+
+entity User {
+  * userId : VARCHAR(255) <<PK>>
+  --
+  userType : ENUM('POS', 'Admin')
+  firstName : VARCHAR(255)
+  middleName : VARCHAR(255)
+  lastName : VARCHAR(255)
+}
+
+entity Event {
+  * eventId : VARCHAR(255) <<PK>>
+  --
+  eventName : VARCHAR(255)
+  eventDate : DATE
+  location : VARCHAR(255)
+  creatorId : VARCHAR(255) <<FK>>
+}
+
+entity Fighter {
+  * fighterId : VARCHAR(255) <<PK>>
+  --
+  name : VARCHAR(255)
+  weight : DOUBLE
+  breed : VARCHAR(255)
+  trainer : VARCHAR(255)
+}
+
+entity Fight {
+  * fightId : VARCHAR(255) <<PK>>
+  --
+  eventId : VARCHAR(255) <<FK>>
+  meronId : VARCHAR(255) <<FK>>
+  walaId : VARCHAR(255) <<FK>>
+  startTime : TIMESTAMP
+  isLocked : BOOLEAN
+  winner : ENUM('Meron', 'Wala', 'Draw')
+}
+
+entity Bet {
+  * betId : VARCHAR(255) <<PK>>
+  --
+  betAmount : DOUBLE
+  betDetails : TEXT
+  transactionId : VARCHAR(255)
+  qrToken : VARCHAR(255)
+  posId : VARCHAR(255) <<FK>>
+  fightId : VARCHAR(255) <<FK>>
+  betOn : ENUM('Meron', 'Wala')
+}
+
+entity Prize {
+  * prizeId : VARCHAR(255) <<PK>>
+  --
+  betId : VARCHAR(255) <<FK>>
+  prizeAmount : DOUBLE
+  isClaimed : BOOLEAN
+}
+
+User ||--o{ Event : creator
+Event ||--o{ Fight : contains
+Fight ||--o{ Bet : contains
+Fight }|--|| Fighter : meronId
+Fight }|--|| Fighter : walaId
+Bet ||--|{ Prize : betId
+User ||--o{ Bet : posId
+
+@enduml
+
+' VIEW IN https://www.planttext.com/

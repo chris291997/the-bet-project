@@ -1,0 +1,92 @@
+@startuml
+
+class User {
+  - userId : String <<PK>>
+  - userType : ENUM('POS', 'Admin')
+  - firstName : String
+  - middleName : String
+  - lastName : String
+}
+
+class POSUser {
+  - posId : String
+  - isLocked : Boolean
+  + acceptBet(bet : Bet)
+  + lockPOS()
+  + unlockPOS()
+  + printReceipt(bet : Bet)
+}
+
+class AdminUser {
+  + createEvent(event : Event)
+  + createFight(fight : Fight)
+  + startFight(fight : Fight)
+  + lockPOS(pos : POSUser)
+  + unlockPOS(pos : POSUser)
+}
+
+class Event {
+  - eventId : String <<PK>>
+  - eventName : String
+  - eventDate : Date
+  - location : String
+  - creatorId : String <<FK>>
+  - fights : List<Fight>
+  + addFight(fight : Fight)
+}
+
+class Fighter {
+  - fighterId : String <<PK>>
+  - name : String
+  - weight : Double
+  - breed : String
+  - trainer : String
+}
+
+class Fight {
+  - fightId : String <<PK>>
+  - eventId : String <<FK>>
+  - meronId : String <<FK>>
+  - walaId : String <<FK>>
+  - startTime : Date
+  - isLocked : Boolean
+  - winner : ENUM('Meron', 'Wala', 'Draw')
+  - bets : List<Bet>
+  + addBet(bet : Bet)
+  + lockFight()
+  + setWinner(winner : String)
+}
+
+class Bet {
+  - betId : String <<PK>>
+  - betAmount : Double
+  - betDetails : String
+  - transactionId : String
+  - qrToken : String
+  - posId : String <<FK>>
+  - fightId : String <<FK>>
+  - betOn : ENUM('Meron', 'Wala')
+}
+
+class Prize {
+  - prizeId : String <<PK>>
+  - betId : String <<FK>>
+  - prizeAmount : Double
+  - isClaimed : Boolean
+  + claimPrize(transactionId : String, qrToken : String)
+}
+
+User <|-- POSUser
+User <|-- AdminUser
+AdminUser "1" --> "0..*" Event : creates
+Event "1" --> "0..*" Fight : contains
+Fight "1" --> "0..*" Bet : contains
+Fight "1" --> "1" Fighter : meron
+Fight "1" --> "1" Fighter : wala
+Prize "1" --> "1" Bet : associated with
+POSUser "1" --> "0..*" Bet : accepts
+User "1" --> "0..*" Event : creator
+
+@enduml
+
+' VIEW IN https://www.planttext.com/
